@@ -1,0 +1,38 @@
+import random
+
+def fitness_function(x):
+    return x**2 - 4*x
+
+def generate_population(size):
+    return [random.uniform(-10, 10) for _ in range(size)]
+
+def evaluate_population(population):
+    return [fitness_function(ind) for ind in population]
+
+def select_parents(population, fitness_values):
+    total_fitness = sum(fitness_values)
+    probs = [f / total_fitness for f in fitness_values]
+    return random.choices(population, probs, k=2)
+
+def crossover(p1, p2):
+    return (p1 + p2) / 2.0, (p1 + p2) / 2.0
+
+def mutate(ind, rate=0.1):
+    return ind + random.uniform(-1, 1) if random.random() < rate else ind
+
+def genetic_algorithm(size, generations):
+    population = generate_population(size)
+    for _ in range(generations):
+        fitness_values = evaluate_population(population)
+        offspring = []
+        while len(offspring) < size:
+            parents = select_parents(population, fitness_values)
+            child1, child2 = crossover(*parents)
+            offspring.extend([mutate(child1), mutate(child2)])
+        population = offspring
+    best_ind = max(population, key=fitness_function)
+    return best_ind
+
+best_solution = genetic_algorithm(100, 50)
+print("Best solution:", best_solution)
+print("Best fitness:", fitness_function(best_solution))
